@@ -1,4 +1,4 @@
 import { AppRegistry } from 'react-native';
-import App from './app/App';
+import RootStack from './app/routes';
 
-AppRegistry.registerComponent('HackerNews', () => App);
+AppRegistry.registerComponent('HackerNews', () => RootStack);
