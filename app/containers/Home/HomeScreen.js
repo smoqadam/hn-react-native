@@ -14,48 +14,61 @@ import {
 
 
 import style from './styles';
-// import { Container, List, ListItem, Spinner, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
 import Main from '../Main';
-import Api from '../../api';
+import Api from '../../api/Api';
 
 export default class HomeScreen extends React.Component {
 
     constructor(props){
       super(props);
-
+      this.api = new Api();
       this.state = {
-        isLoading: true
+        isLoading: true,
+        page: 1,
+        data: []
       };
     }
     componentDidMount(){
-      let api = new Api();  
-      let hotList;;
-      fetch('https://hn.algolia.com/api/v1/search_by_date')
-      .then((response) => response.json())
-      .then((json) => {
-        this.setState({
-          isLoading: false,
-          data: json
-        });
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
+      this.getData(this.state.page);
     }
 
+
+    getData(page = 1){
+      
+      console.log({page});
+      console.log(this.state.isLoading);
+      this.api
+      .getHotList(page)
+      .then(json => {
+        let posts = this.state.data;
+         for (let i=0;i < json.hits.length;i++){
+            posts.push(json.hits[i]);
+         }
+         this.setState({
+            isLoading: false,
+            data: posts,
+            page
+          });
+      }).catch(function(e){
+        console.log(e);
+      })
+
+    }
+
+    
     render() {
-      if(this.state.isLoading){
-        return(
-          <View style={{flex: 1, padding: 20}}>
-            <Spinner/>
-          </View>
-        )
-      }
-      console.log(this.state.data);
       return(
-        <Main title="Hot">  
+        <Main title="Front Page">  
           <FlatList
-                data={this.state.data.hits}
+                onEndReached={() => {
+                  this.setState({
+                    ...this.state,
+                    isLoading: true,
+                  });
+                  this.getData(this.state.page+1);
+                  }}
+                onEndReachedThreshold={0.5}
+                data={this.state.data}
                 renderItem={({item}) => (
                 <TouchableHighlight
                     onPress={() => {
@@ -64,11 +77,13 @@ export default class HomeScreen extends React.Component {
                     <View style={{padding:10, backgroundColor: 'white'}}>
                         <Text>{item.title?item.title:item.story_title}</Text>
                         <Text note>{item.author}</Text>
+                        <Right><Text note>{(new Date(item.created_at_i)).getDate()}</Text></Right>
                     </View>
                 </TouchableHighlight>
             )}
             keyExtractor={(item, index) => index.toString()}
             />
+            {this.state.isLoading && <Spinner />}
         </Main>
       );
     }

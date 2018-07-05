@@ -3,15 +3,19 @@ import React, {Component} from 'react';
 import {
     Platform,
     StyleSheet,
-    Text,
     Button,
     View
 } from 'react-native';
 import Main from '../Main';
 import {
-    Spinner
-  } from 'native-base';
-  import HTML from 'react-native-render-html';  
+  Text,Left, Right,
+  Spinner, Separator
+} from 'native-base';
+
+import HTML from 'react-native-render-html';  
+
+import Api from '../../api/Api';
+import { bold } from 'ansi-colors';
 
 export default class DetailsScreen extends React.Component {
     static navigationOptions = {
@@ -20,27 +24,24 @@ export default class DetailsScreen extends React.Component {
 
     constructor(props){
         super(props);
-  
+        this.api = new Api();
         this.state = {
           isLoading: true
         };
       }
     componentDidMount(){
         let item = this.props.navigation.getParam('item');
-        console.log(item.story_id);
-        
-      fetch('https://hn.algolia.com/api/v1/items/'+item.story_id)
-      .then((response) => response.json())
-      .then((json) => {
-        console.log(json);
-        this.setState({
-          isLoading: false,
-          data: json
-        });
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
+        console.log('item', item);
+        this.api
+          .getComments(item.objectID)
+          .then(json => {
+              this.setState({
+                isLoading: false,
+                data: json
+              });
+          }).catch(function(e){
+            console.log(e);
+          })
     }
 
     render(){
@@ -52,9 +53,19 @@ export default class DetailsScreen extends React.Component {
         )
       }
         return (
-            <Main title="Hot">  
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text>Details Screen ID: {this.state.data.text?this.state.data.text:this.state.data.story_title}</Text>
+            <Main title={this.state.data.title}>  
+                <View style={{ flex: 1}}>
+                    <View style={{padding:10, backgroundColor:'#eeeeee'}}>
+                      <Text>
+                        {this.state.data.title}
+                        {this.state.data.story_text}
+                      </Text>
+                      <Right>
+                         <Text note>{this.state.data.author}</Text>
+                      </Right>
+                    </View>
+                    <Text style={{color:'#000000',margin: 10}}>Comments: </Text>
+                    <Separator  />
                     <Comments children={this.state.data.children} />
                 </View>
             </Main>
@@ -69,14 +80,14 @@ export default class DetailsScreen extends React.Component {
       let children = this.props.children;
         
       return (
-        <View style={{borderLeftWidth:1,borderLeftColor:'#eeeeee'}}>
+        <View style={{borderLeftWidth:1,borderLeftColor:'#cccccc'}}>
           {children.map(comment =>
             <View key={comment.id} style={{marginLeft:10}}>
-              <HTML html={comment.text?comment.text:''} />
+              {comment.text && <HTML html={comment.text} />}
               {comment.children && <Comments children={comment.children}/>}
             </View>
           )}
         </View>
       )
-    }
+      }
 }
