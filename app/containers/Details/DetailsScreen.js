@@ -47,25 +47,26 @@ export default class DetailsScreen extends React.Component {
     render(){
       if(this.state.isLoading){
         return(
-          <View style={{flex: 1, padding: 20}}>
-            <Spinner/>
-          </View>
+          <Main title="Loading...">  
+            <View style={{flex: 1, padding: 20}}>
+              <Spinner/>
+            </View>
+          </Main>
         )
       }
         return (
             <Main title={this.state.data.title}>  
                 <View style={{ flex: 1}}>
                     <View style={{padding:10, backgroundColor:'#eeeeee'}}>
-                      <Text>
+                     <Text note style={{alignSelf:'flex-start'}}>{this.state.data.author}</Text>
+                    <Text>
                         {this.state.data.title}
                         {this.state.data.story_text}
                       </Text>
-                      <Right>
-                         <Text note>{this.state.data.author}</Text>
-                      </Right>
                     </View>
-                    <Text style={{color:'#000000',margin: 10}}>Comments: </Text>
-                    <Separator  />
+                    <Separator bordered>
+                      <Text style={{fontSize:20,borderBottomColor:'#000000',borderBottomWidth:2}}>Comments</Text>
+                    </Separator>
                     <Comments children={this.state.data.children} />
                 </View>
             </Main>

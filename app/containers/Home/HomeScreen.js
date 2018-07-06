@@ -60,7 +60,7 @@ export default class HomeScreen extends React.Component {
     
     render() {
       return(
-        <Main title="Front Page" onRefreshPress={() => {
+        <Main title="Front Page" refreshButton onRefreshPress={() => {
               console.log('a');
               this.setState({
                 ...this.state,

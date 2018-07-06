@@ -5,8 +5,7 @@ import {
     StyleSheet, View
 } from 'react-native';
 import style from './styles';
-import { Container,Drawer, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
-import SideBar from '../../components/Sidebar';
+import { Container, Header, Title, Content, Button, Right, Body, Icon } from 'native-base';
 
 export default class Main extends React.Component {
   
@@ -19,13 +18,15 @@ export default class Main extends React.Component {
             <Body>
               <Title>Hacker News {this.props.title}</Title>
             </Body>
-            <Right>
-            <Button transparent
-              onPress={this.props.onRefreshPress}>
-                <Icon name='refresh' />
-              </Button>
-            </Right>
-          </Header>
+            {this.props.refreshButton && 
+              <Right>
+                <Button transparent
+                  onPress={this.props.onRefreshPress}>
+                  <Icon name='refresh' />
+                </Button>
+              </Right>
+              }
+              </Header>
           <Content>
               {this.props.children}
           </Content>
